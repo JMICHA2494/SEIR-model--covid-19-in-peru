@@ -1,0 +1,41 @@
+function [S,E,I,R] = seir_model(beta,gamma,delta,N,I0,E0,T,dt)
+% parametros del modelo
+beta = 5*10^-9; % tasa de infeccion
+alfa = 0.011;
+gamma = 0.012; % tasa de recuperacion 
+%delta = 0.0; % tasa de inmunidad
+N = 30e6; % poblacion total
+I0 = 10; % numero inciial de infectados
+E0 = 500;
+T = 500; % 300 dias periodo
+dt = 1/4; % 1/4 de dia
+delta = 1/60;
+fprintf('el valor del parametro R0 es : %.2f',N*beta/gamma)
+
+   % if delta = 0 we assume a model without immunity loss
+    S = zeros(1,T/dt);
+    S(1) = N;
+    E = zeros(1,T/dt);
+    E(1) = E0
+    I = zeros(1,T/dt);
+    I(1) = I0;
+    R = zeros(1,T/dt);
+    for tt = 1:(T/dt)-1
+        % ecuaciones del modelo
+        dS = (-beta*I(tt)*S(tt) + delta*S(tt)) * dt;
+        dE = (beta*I(tt)*S(tt) - alfa*E(tt)) * dt;
+        dI = (beta*I(tt)*S(tt) - gamma*I(tt)) * dt;
+        dR = (gamma*I(tt) - delta*R(tt)) * dt;
+        S(tt+1) = S(tt) + dS;
+        I(tt+1) = I(tt) + dI;
+        E(tt+1) = E(tt) + dE;
+        R(tt+1) = R(tt) + dR;
+    end
+tt = 0:dt:T-dt;
+% grafica
+plot(tt,S,'b',tt,I,'r',tt,R,'g',tt,E,'y','LineWidth',2); grid on;
+xlabel('Dias');ylabel('Numero de personas');
+legend('S','I','R','E');
+set(gca, 'Fontsize', 10);
+
+end
