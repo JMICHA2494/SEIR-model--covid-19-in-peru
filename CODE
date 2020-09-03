@@ -1,1 +1,80 @@
+% Calcula el modelo SEIR utilizando el método de cuarto orden de Runge-Kutta
+% cristian,betty,daniel,junior
+% 25/08/2020
+clc;% limipeza de pantalla
+clear all;%ninguna variable definida
 
+%%%% Especificación de parametros %%%%
+b = 0.0534; beta = 0.09091; sigma = 0.00; mu =  0.03835; gamma = 0.125;  alpha = 0.14286;
+h= 0.0001;  tfinal = 100;
+N = ceil(tfinal/h);% calcula hasta y(10000) ceil(tfinal/h)
+
+% Condiciones Iniciales
+f1 = @(t, S,E,I,R)b - (beta*I + (mu))* S;      % cambia la funcion como se desea
+f2 = @(t, S,E,I,R)(beta * S * I ) - (mu + alpha + sigma  )*E
+f3 = @(t, S,E,I,R)(alpha * E)  - (mu + gamma )*I
+f4 = @(t, S,E,I,R)(gamma * I) + (sigma*E) - (mu*R)  
+% Condiciones iniciales
+t(1)=0; S(1)=00000; S0 = 800000;  E(1)=150000; E0 = 150000; I(1)=10000; I0=10000; R(1) =40000;R0 =40000;
+%cambios o intervalos
+for i=1:N;  % bucle de actualización
+%actualizacion de tiempo
+t(i+1) = t(i) + h; 
+
+%%%%% Primera etapa %%%%%
+    
+ K1S = f1( t(i) ,  S(i),  E(i),  I(i),  R(i)   );
+ K1E = f2( t(i) ,  S(i) ,  E(i) , I(i) ,  R(i) );
+ K1I = f3( t(i) , S(i) , E(i) , I(i) , R(i) );
+ K1R = f4( t(i) , S(i) , E(i) , I(i) , R(i) );
+ %%%%% Segunda etapa %%%%%%
+ K2S = f1( t(i) + 0.5*h,   S(i) + 0.5*h*K1S,   E(i) +  0.5*h*K1E,   I(i) + 0.5*h* K1I ,   R(i) + 0.5*h* K1R );
+ K2E = f2( t(i) + 0.5*h,   S(i) + 0.5*h*K1S,   E(i) +  0.5*h*K1E,   I(i) + 0.5*h* K1I ,   R(i) + 0.5*h* K1R );
+ K2I = f3( t(i) + 0.5*h,   S(i) + 0.5*h*K1S,   E(i) +  0.5*h*K1E,   I(i) + 0.5*h* K1I ,   R(i) + 0.5*h* K1R );
+ K2R = f4( t(i) + 0.5*h,   S(i) + 0.5*h*K1S,   E(i) +  0.5*h*K1E,   I(i) + 0.5*h* K1I ,   R(i) + 0.5*h* K1R );
+
+ %%%%% Tercera etapa %%%%%
+ K3S = f1( t(i) + 0.5*h,   S(i) + 0.5*h*K2S,   E(i) +  0.5*h*K2E,   I(i) + 0.5*h* K2I ,   R(i) + 0.5*h* K2R );
+ K3E = f2( t(i) + 0.5*h,   S(i) + 0.5*h*K2S,   E(i) +  0.5*h*K2E,   I(i) + 0.5*h* K2I ,   R(i) + 0.5*h* K2R );
+ K3I = f3( t(i) + 0.5*h,   S(i) + 0.5*h*K2S,   E(i) +  0.5*h*K2E,   I(i) + 0.5*h* K2I ,   R(i) + 0.5*h* K2R );
+ K3R = f4( t(i) + 0.5*h,   S(i) + 0.5*h*K2S,   E(i) +  0.5*h*K2E,   I(i) + 0.5*h* K2I ,   R(i) + 0.5*h* K2R );
+ %%%%% Cuarta etapa %%%%%
+ K4S = f1( t(i) + h,   S(i) + h*K3S,   E(i) +  h*K3E,   I(i) + h* K3I ,   R(i) + h*K3R );
+ K4E = f2( t(i) + h,   S(i) + h*K3S,   E(i) +  h*K3E,   I(i) + h* K3I ,   R(i) +  h*K3R );  
+ K4I = f3( t(i) + h,   S(i) + h*K3S,   E(i) +  h*K3E,   I(i) + h* K3I ,   R(i) +  h*K3R ); 
+ K4R = f4( t(i) + h,   S(i) + h*K3S,   E(i) +  h*K3E,   I(i) +h* K3I ,   R(i) +  h*K3R );   
+    
+ %%%%% Ahora las ecuaciones principales %%%%%
+     
+   S(i+1) = S(i) + (1/6)*(K1S+ 2*K2S+2*K3S+K4S )*h;  
+   E(i+1)  = E(i) + (1/6)*(K1E+2*K2E+2*K3E+K4E)*h; 
+   I(i+1) = I(i) + (1/6)*(K1I+2*K2I+2*K3I+K4I)*h;
+   R(i+1) = R(i) + (1/6)*(K1R+2*K2R+2*K3R+K4R)*h;
+   %S(i+1)
+   %E(i+1)
+ 
+    
+end
+
+%grafica de soluciones particulares
+%figure(1); clf(1)
+%plot(t,S)
+
+%hold on
+%plot(t,E)
+
+%plot(t,I)
+%plot(t,R)
+
+
+%legend('S(t)')
+%legend('E(t)')
+%legend('I(t)')
+%legend('R(t)')
+
+%La funcion para graficar todas las curvas
+plot(t,S,t,E,t,I,t,R)
+legend('S(t)', 'E(t)', 'I(t)', 'R(t)')
+xlabel('Tiempo(dias)')
+ylabel('Población(millones)')
+set(gca, 'Fontsize', 12)
