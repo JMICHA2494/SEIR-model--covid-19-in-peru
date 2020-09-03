@@ -1,0 +1,32 @@
+%graficas de indices de recuperacion y de mortalidad
+function [S,E,I,Q,R,D,P] = SEIQRDP(alpha,beta,gamma,delta,Lambda,Kappa,Npop,E0,I0,Q0,R0,D0,t,lambdaFun0,kappaFun0)
+clearvars; close all;clc;
+%tiempo definicion
+dt = 0.1; %tiempo de pasos
+time1 = [0:1000];
+N = numel(time1);
+t = [0:N-1].*dt;
+%Npop = 30*10^6;
+
+Npop = 32000000; %poblacion total
+Q0 = 200;%número inicial de infecciosos que han sido puestos en cuarentena
+I0 = Q0;%número inicial de infecciosos que no han sido puestos en cuarentena
+E0 = 0;%número inicial de expuestos
+R0 = 10;%numero inicial de recuperados
+D0 = 10;%numero inicial de muertos
+alpha = 0.08;%tasa de proteccion
+beta = 0.17;%tasa de infeccion
+gamma = 0.25;%inverso del tiempo medio de latencia
+delta = 0.5;%velocidad a la que las personas infecciosas entran en cuarentena
+Lambda = [0.01 0.1 100]; %tasa de curación(dependiente del tiempo)
+Kappa = [0.001 0.01 60];%tasa de mortalidad(dependiente del tiempo)
+%elección de una forma particular de lambda
+lambdaFun0 = @(a,t)a(1)./(1 +exp(-a(2)*(t-a(3))));
+kappaFun0 = @(a,t)a(1).*exp(-(a(2)*(t-a(3))).^2);
+%graficos
+plot(t,lambdaFun0(Lambda,t), 'b',t,kappaFun0(Kappa,t),'k');
+legend('indice de recuperación','indice de mortalidad','ubicacion','mejor');
+xlabel('tiempo(dias)');
+ylabel('valor(indice)');
+set(gcf,'color','w');
+end
